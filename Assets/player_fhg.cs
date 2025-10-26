@@ -16,7 +16,7 @@ public class player_fhg : MonoBehaviour
     private float moveInput;
     int jumpCount = 0;
     int maxJumps = 2;
-    public float sprintMultiplier = 1.8f;
+    public float sprintMultiplier = 2;
     bool isSprinting = false;
 
 
@@ -65,7 +65,7 @@ public class player_fhg : MonoBehaviour
         if (isJump && jumpCount < maxJumps)
         {
 
-            rigidbody2.velocity = new Vector2(rigidbody2.velocity.x, 0f);
+            rigidbody2.velocity = new Vector2(rigidbody2.velocity.x, 0);
             rigidbody2.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
             jumpCount++;
