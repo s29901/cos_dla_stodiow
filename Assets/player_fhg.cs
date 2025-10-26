@@ -7,15 +7,19 @@ public class player_fhg : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    public float moveSpeed = 5000;
-    public float jumpForce = 300;
+    public float moveSpeed = 10;
+    public float jumpForce = 10;
     public Rigidbody2D rigidbody2;
     public SpriteRenderer spriteRenderer;
-    public  GroundChecker groundChecker;
-    public bool isJump =false;
-    private float moveInput;    
+    public GroundChecker groundChecker;
+    public bool isJump = false;
+    private float moveInput;
+    int jumpCount = 0;
+    int maxJumps = 2;
+    public float sprintMultiplier = 1.8f;
+    bool isSprinting = false;
 
-    
+
 
 
 
@@ -29,25 +33,48 @@ public class player_fhg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         moveInput = Input.GetAxis("Horizontal");
-       
-      if(Input.GetKeyDown(KeyCode.Space))
-        {
-        isJump = true;
-        }
-       
+        if (moveInput > 0) spriteRenderer.flipX = false;
+        else if (moveInput < 0) spriteRenderer.flipX = true;
+
+        isSprinting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            isJump = true;
+
+
 
     }
 
     private void FixedUpdate()
     {
-        rigidbody2.velocity = new Vector2(moveInput * moveSpeed * Time.fixedDeltaTime, rigidbody2.velocity.y);   
-        if(isJump && groundChecker.isGrounded)  
-        {
-            rigidbody2.AddForce(Vector2.up * jumpForce);
-            isJump = false;
+        float currentSpeed = moveSpeed;
 
+        if (isSprinting)
+            currentSpeed *= sprintMultiplier;
+        rigidbody2.velocity = new Vector2(moveInput * currentSpeed, rigidbody2.velocity.y);
+
+
+        if (groundChecker.isGrounded)
+        {
+            jumpCount = 0;
         }
+
+
+        if (isJump && jumpCount < maxJumps)
+        {
+
+            rigidbody2.velocity = new Vector2(rigidbody2.velocity.x, 0f);
+            rigidbody2.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
+            jumpCount++;
+        }
+
+        isJump = false;
+
+    }
 }
-}
+
+
+
