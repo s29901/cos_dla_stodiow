@@ -1,80 +1,64 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 public class player_fhg : MonoBehaviour
 {
-    // Start is called before the first frame update
-
-    public float moveSpeed = 10;
-    public float jumpForce = 10;
+    public float moveSpeed = 10f;
+    public float jumpForce = 10f;
     public Rigidbody2D rigidbody2;
     public SpriteRenderer spriteRenderer;
     public GroundChecker groundChecker;
-    public bool isJump = false;
+
+    private Animator anim;
     private float moveInput;
-    int jumpCount = 0;
-    int maxJumps = 2;
-    public float sprintMultiplier = 2;
-    bool isSprinting = false;
+    private int jumpCount = 0;
+    private int maxJumps = 2;
+    public float sprintMultiplier = 2f;
+    private bool isSprinting = false;
+    private bool wantJump = false;
 
-
-
-
-
-    void Start()
+    void Awake()
     {
-        rigidbody2 = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-
+        // возьми компоненты автоматически
+        if (!rigidbody2) rigidbody2 = GetComponent<Rigidbody2D>();
+        if (!spriteRenderer) spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-
-        moveInput = Input.GetAxis("Horizontal");
+        moveInput = Input.GetAxisRaw("Horizontal"); 
         if (moveInput > 0) spriteRenderer.flipX = false;
         else if (moveInput < 0) spriteRenderer.flipX = true;
 
         isSprinting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        if (Input.GetKeyDown(KeyCode.Space))
-            isJump = true;
+        if (Input.GetKeyDown(KeyCode.Space)) wantJump = true;
 
-
-
+      
+        if (anim)
+        {
+            anim.SetFloat("Speed", Mathf.Abs(moveInput));
+            if (groundChecker) anim.SetBool("IsGrounded", groundChecker.isGrounded);
+        }
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        float currentSpeed = moveSpeed;
-
-        if (isSprinting)
-            currentSpeed *= sprintMultiplier;
+        float currentSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
         rigidbody2.velocity = new Vector2(moveInput * currentSpeed, rigidbody2.velocity.y);
 
+        if (groundChecker && groundChecker.isGrounded) jumpCount = 0;
 
-        if (groundChecker.isGrounded)
+        if (wantJump && jumpCount < maxJumps)
         {
-            jumpCount = 0;
-        }
-
-
-        if (isJump && jumpCount < maxJumps)
-        {
-
-            rigidbody2.velocity = new Vector2(rigidbody2.velocity.x, 0);
+            rigidbody2.velocity = new Vector2(rigidbody2.velocity.x, 0f);
             rigidbody2.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
             jumpCount++;
+
+            if (anim) anim.SetTrigger("Jump"); 
         }
+        anim.SetFloat("Speed", Mathf.Abs(moveInput));
 
-        isJump = false;
-
+        wantJump = false;
     }
 }
-
-
-

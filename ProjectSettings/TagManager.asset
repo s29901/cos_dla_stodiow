@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - pered
+  - back
   layers:
   - Default
   - TransparentFX
@@ -11,7 +13,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - background
   - 
   - 
   - 
@@ -38,6 +40,15 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: back
+    uniqueID: 4123143549
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: ground
+    uniqueID: 2468261079
+    locked: 0
+  - name: player
+    uniqueID: 1550004787
     locked: 0
